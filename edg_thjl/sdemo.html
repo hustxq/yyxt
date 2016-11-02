@@ -1,0 +1,244 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="keywords" content="jquery,ui,easy,easyui,web">
+	<meta name="description" content="easyui help you build your web page easily!">
+	<title>Add search functionality in DataGrid - jQuery EasyUI Demo</title>
+	<link rel="stylesheet" type="text/css"
+	href="http://www.jeasyui.net/Public/js/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="http://www.jeasyui.net/Public/js/easyui/themes/icon.css">
+	
+	<script type="text/javascript" src="../js/jquery.PrintArea.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="http://www.w3cschool.cc/try/jeasyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="http://www.w3cschool.cc/try/jeasyui/jquery.edatagrid.js"></script>
+	<script type="text/javascript" src="http://www.jeasyui.net/Public/js/easyui/locale/easyui-lang-zh_CN.js" ></script>
+	<script type="text/javascript">
+	$(function(){
+		$('#tt').edatagrid({
+			//url: 'get_users.php',
+			saveUrl: 'save_user.php',
+			updateUrl: 'update_user.php',
+			destroyUrl: 'destroy_user.php'
+		});
+	});
+	
+	function removeUser() {
+		var row = $('#tt').datagrid('getSelected');
+		if (row) {
+			$.messager.confirm('确认', '是否确认删除此项?', function(r) {
+				if (r) {
+					$.post('destroy_user.php', {
+						id : row.id
+					}, function(result) {
+						if (result.success) {
+							$('#tt').datagrid('reload'); // reload the user data
+						} else {
+							$.messager.show({ // show error message
+								title : '错误',
+								msg : result.msg
+							});
+						}
+					}, 'json');//, 'json'
+				}
+			});
+		}
+	}
+	
+	function doSearch(){
+			$('#tt').datagrid('load',{
+				itemid: $('#st_c').val(),
+				productid: $('#productid').val()
+			});
+		}
+	
+	function submitdd() {
+		$.messager.confirm('Confirm',
+				'确认提交此订单吗?', function(r) {
+					if (r) {
+						$.get('destroy_all.php');
+					}
+				});
+	}
+	/* $("a#biuuu_button").click(function(){
+		$("div#myPrintArea").printArea();
+		//alert(111);
+	}); */
+	function print(){
+		/* alert("print");
+		$("#tt").printArea(); */
+		//$.ajax();
+		$.get('../print/index.php');
+	}
+	</script>
+	
+	<!--//打印-->
+    <script type="text/javascript">
+    function CurentTime()
+    { 
+        var now = new Date();
+       
+        var year = now.getFullYear();       //年
+        var month = now.getMonth() + 1;     //月
+        var day = now.getDate();            //日
+       
+        var hh = now.getHours();            //时
+        var mm = now.getMinutes();          //分
+       
+        var clock = year + "-";
+       
+        if(month < 10)
+            clock += "0";
+       
+        clock += month + "-";
+       
+        if(day < 10)
+            clock += "0";
+           
+        clock += day + " ";
+       
+        if(hh < 10)
+            clock += "0";
+           
+        clock += hh + ":";
+        if (mm < 10) clock += '0'; 
+        clock += mm; 
+        return(clock); 
+    } 
+        function CreateFormPage(strPrintName, printDatagrid) {
+            
+        	var tableString = '<div><table width="100%"><tr style="text-align:center;"><td colspan="2" style="font-size:24px; font-weight:bold;"><span style="text-decoration:underline;">&nbsp;&nbsp;&nbsp; </span>年<span style="text-decoration:underline;">&nbsp;&nbsp;&nbsp; </span>订单表</td></tr><tr><td style="text-align:left;">公司： </td><td style="text-align:right;">报送时间：'+CurentTime()+'</td></tr></table> <table cellspacing="0" class="pb">';
+            var frozenColumns = printDatagrid.datagrid("options").frozenColumns;  // 得到frozenColumns对象
+            var columns = printDatagrid.datagrid("options").columns;    // 得到columns对象
+            var nameList = '';
+
+            // 载入title
+            if (typeof columns != 'undefined' && columns != '') {
+                $(columns).each(function (index) {
+                    tableString += '\n<tr>';
+                    if (typeof frozenColumns != 'undefined' && typeof frozenColumns[index] != 'undefined') {
+                        for (var i = 0; i < frozenColumns[index].length; ++i) {
+                            if (!frozenColumns[index][i].hidden) {
+                                tableString += '\n<th width="' + frozenColumns[index][i].width + '"';
+                                if (typeof frozenColumns[index][i].rowspan != 'undefined' && frozenColumns[index][i].rowspan > 1) {
+                                    tableString += ' rowspan="' + frozenColumns[index][i].rowspan + '"';
+                                }
+                                if (typeof frozenColumns[index][i].colspan != 'undefined' && frozenColumns[index][i].colspan > 1) {
+                                    tableString += ' colspan="' + frozenColumns[index][i].colspan + '"';
+                                }
+                                if (typeof frozenColumns[index][i].field != 'undefined' && frozenColumns[index][i].field != '') {
+                                    nameList += ',{"f":"' + frozenColumns[index][i].field + '", "a":"' + frozenColumns[index][i].align + '"}';
+                                }
+                                tableString += '>' + frozenColumns[0][i].title + '</th>';
+                            }
+                        }
+                    }
+                    for (var i = 0; i < columns[index].length; ++i) {
+                        if (!columns[index][i].hidden) {
+                            tableString += '\n<th width="' + columns[index][i].width + '"';
+                            if (typeof columns[index][i].rowspan != 'undefined' && columns[index][i].rowspan > 1) {
+                                tableString += ' rowspan="' + columns[index][i].rowspan + '"';
+                            }
+                            if (typeof columns[index][i].colspan != 'undefined' && columns[index][i].colspan > 1) {
+                                tableString += ' colspan="' + columns[index][i].colspan + '"';
+                            }
+                            if (typeof columns[index][i].field != 'undefined' && columns[index][i].field != '') {
+                                nameList += ',{"f":"' + columns[index][i].field + '", "a":"' + columns[index][i].align + '"}';
+                            }
+                            tableString += '>' + columns[index][i].title + '</th>';
+                        }
+                    }
+                    tableString += '\n</tr>';
+                });
+            }
+            // 载入内容
+            var rows = printDatagrid.datagrid("getRows"); // 这段代码是获取当前页的所有行
+            var nl = eval('([' + nameList.substring(1) + '])');
+            for (var i = 0; i < rows.length; ++i) {
+                tableString += '\n<tr>';
+                $(nl).each(function (j) {
+                    var e = nl[j].f.lastIndexOf('_0');
+
+                    tableString += '\n<td';
+                    if (nl[j].a != 'undefined' && nl[j].a != '') {
+                        tableString += ' style="text-align:' + nl[j].a + ';"';
+                    }
+                    tableString += '>';
+                    if (e + 2 == nl[j].f.length) {
+                        tableString += rows[i][nl[j].f.substring(0, e)];
+                    }
+                    else
+                        tableString += rows[i][nl[j].f];
+                    tableString += '</td>';
+                });
+                tableString += '\n</tr>';
+            }
+            tableString += '\n</table></div>';
+
+            window.showModalDialog("print.htm", tableString,
+    "location:No;status:No;help:No;dialogWidth:800px;dialogHeight:600px;scroll:auto;");
+        }
+    </script>
+</head>
+<body>	
+
+	<table id="tt" class="easyui-datagrid" style="width: 100%; height: 450px"
+			url="datagrid24_getdata.php" fit="true"
+			toolbar="#tb"
+			rownumbers="true" pagination="true">
+		<thead>
+			<tr>
+				<th field="ckbh" width="150" align="center" editor="{type:'validatebox',options:{required:true}}">出库单号</th>
+				
+				<th field="spbh" width="150" align="center" editor="{type:'validatebox',options:{required:true}}">商品编号</th>
+				<th field="spmc" width="150" align="center" editor="{type:'validatebox',options:{required:true}}">商品名称</th>
+				<th field="spgg" width="150" align="center" editor="text">商品规格</th>
+				<th field="bzdw" width="150" align="center" editor="text">包装单位</th>
+				
+				<th field="scqy" width="150" align="right" editor="text">生产企业</th>
+				<th field="hwmc" width="150" align="right" editor="text">货位名称</th>
+				<th field="ph" width="150" align="right" editor="text">批号</th>
+				<th field="bzqz" width="150" align="right" editor="text">保质期至</th>
+				
+				<th field="sl" width="150" align="right" editor="text">数量</th>
+				<th field="hsj" width="150" align="right" editor="text">含税价</th>
+				<th field="zdsj" width="150" align="right" editor="text">指导售价</th>
+				<th field="je" width="150" align="right" editor="text">金额</th>
+			
+				<th field="mjph" width="150" align="right" editor="text">灭菌批号</th>
+				<th field="phsl" width="150" align="right" editor="text">批号数量</th>
+				<th field="bzsl" width="150" align="right" editor="text">包装数量</th>
+				<th field="lssl" width="150" align="right" editor="text">零散数量</th>
+				
+				<th field="cbdj" width="150" align="right" editor="text">成本单价</th>
+				<th field="lsj" width="150" align="right" editor="text">零售价</th>
+				
+			</tr>
+		</thead>
+	</table>
+
+	<div id="tb" style="padding:3px">
+		
+		<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="removeUser()">删除</a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="javascript:$('#tt').edatagrid('saveRow')">保存</a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="javascript:$('#tt').edatagrid('cancelRow')">取消</a>
+		
+		<select name="st_c" id="st_c" style="width:80px;">
+			<option value="spmc">商品名称</option>
+			<option value="spbh">商品编号</option>
+			<option value="scqy">生产企业</option>
+		</select>
+		<input id="productid" style="line-height:26px;border:1px solid #ccc">
+		<a href="#" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="doSearch()">搜索</a>
+		
+<!-- 		<a href="#" class="easyui-linkbutton" iconCls="icon-ok" plain="true" onclick="submitdd()">提交入库</a>
+ -->		
+		<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-print" plain="true" onclick="CreateFormPage('打印测试', $('#tt'));">打印</a>
+	<!-- 	<a href="#" class="easyui-linkbutton" iconCls="icon-print" plain="true" onclick="print()">打印</a> -->
+	</div>
+	
+	
+	
+</body>
+</html>

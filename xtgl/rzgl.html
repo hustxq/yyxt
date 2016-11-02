@@ -1,0 +1,189 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="keywords" content="jquery,ui,easy,easyui,web">
+	<meta name="description" content="easyui help you build your web page easily!">
+	<title>Add search functionality in DataGrid - jQuery EasyUI Demo</title>
+	<link rel="stylesheet" type="text/css"
+	href="http://www.jeasyui.net/Public/js/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="http://www.jeasyui.net/Public/js/easyui/themes/icon.css">
+	
+	<script type="text/javascript" src="../js/jquery.PrintArea.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="http://www.w3cschool.cc/try/jeasyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="http://www.w3cschool.cc/try/jeasyui/jquery.edatagrid.js"></script>
+	<script type="text/javascript" src="http://www.jeasyui.net/Public/js/easyui/locale/easyui-lang-zh_CN.js" ></script>
+	<script type="text/javascript">
+	$(function(){
+		$('#tt').edatagrid({
+			//url: 'get_users.php',
+			saveUrl: 'save_user.php',
+			updateUrl: 'update_user.php',
+			destroyUrl: 'destroy_user.php'
+		});
+	});
+	
+	function doSearch(){
+			$('#tt').datagrid('load',{
+				itemid: $('#st_c').val(),
+				productid: $('#productid').val()
+			});
+		}
+	
+	function submitdd() {
+		$.messager.confirm('Confirm',
+				'确认提交此订单吗?', function(r) {
+					if (r) {
+						$.get('destroy_all.php');
+					}
+				});
+	}
+	/* $("a#biuuu_button").click(function(){
+		$("div#myPrintArea").printArea();
+		//alert(111);
+	}); */
+	function print(){
+		/* alert("print");
+		$("#tt").printArea(); */
+		//$.ajax();
+		$.get('../print/index.php');
+	}
+	</script>
+	
+	<!--//打印-->
+    <script type="text/javascript">
+    function CurentTime()
+    { 
+        var now = new Date();
+       
+        var year = now.getFullYear();       //年
+        var month = now.getMonth() + 1;     //月
+        var day = now.getDate();            //日
+       
+        var hh = now.getHours();            //时
+        var mm = now.getMinutes();          //分
+       
+        var clock = year + "-";
+       
+        if(month < 10)
+            clock += "0";
+       
+        clock += month + "-";
+       
+        if(day < 10)
+            clock += "0";
+           
+        clock += day + " ";
+       
+        if(hh < 10)
+            clock += "0";
+           
+        clock += hh + ":";
+        if (mm < 10) clock += '0'; 
+        clock += mm; 
+        return(clock); 
+    } 
+        function CreateFormPage(strPrintName, printDatagrid) {
+            
+        	var tableString = '<div><table width="100%"><tr style="text-align:center;"><td colspan="2" style="font-size:24px; font-weight:bold;"><span style="text-decoration:underline;">&nbsp;&nbsp;&nbsp; </span>年<span style="text-decoration:underline;">&nbsp;&nbsp;&nbsp; </span>订单表</td></tr><tr><td style="text-align:left;">公司： </td><td style="text-align:right;">报送时间：'+CurentTime()+'</td></tr></table> <table cellspacing="0" class="pb">';
+            var frozenColumns = printDatagrid.datagrid("options").frozenColumns;  // 得到frozenColumns对象
+            var columns = printDatagrid.datagrid("options").columns;    // 得到columns对象
+            var nameList = '';
+
+            // 载入title
+            if (typeof columns != 'undefined' && columns != '') {
+                $(columns).each(function (index) {
+                    tableString += '\n<tr>';
+                    if (typeof frozenColumns != 'undefined' && typeof frozenColumns[index] != 'undefined') {
+                        for (var i = 0; i < frozenColumns[index].length; ++i) {
+                            if (!frozenColumns[index][i].hidden) {
+                                tableString += '\n<th width="' + frozenColumns[index][i].width + '"';
+                                if (typeof frozenColumns[index][i].rowspan != 'undefined' && frozenColumns[index][i].rowspan > 1) {
+                                    tableString += ' rowspan="' + frozenColumns[index][i].rowspan + '"';
+                                }
+                                if (typeof frozenColumns[index][i].colspan != 'undefined' && frozenColumns[index][i].colspan > 1) {
+                                    tableString += ' colspan="' + frozenColumns[index][i].colspan + '"';
+                                }
+                                if (typeof frozenColumns[index][i].field != 'undefined' && frozenColumns[index][i].field != '') {
+                                    nameList += ',{"f":"' + frozenColumns[index][i].field + '", "a":"' + frozenColumns[index][i].align + '"}';
+                                }
+                                tableString += '>' + frozenColumns[0][i].title + '</th>';
+                            }
+                        }
+                    }
+                    for (var i = 0; i < columns[index].length; ++i) {
+                        if (!columns[index][i].hidden) {
+                            tableString += '\n<th width="' + columns[index][i].width + '"';
+                            if (typeof columns[index][i].rowspan != 'undefined' && columns[index][i].rowspan > 1) {
+                                tableString += ' rowspan="' + columns[index][i].rowspan + '"';
+                            }
+                            if (typeof columns[index][i].colspan != 'undefined' && columns[index][i].colspan > 1) {
+                                tableString += ' colspan="' + columns[index][i].colspan + '"';
+                            }
+                            if (typeof columns[index][i].field != 'undefined' && columns[index][i].field != '') {
+                                nameList += ',{"f":"' + columns[index][i].field + '", "a":"' + columns[index][i].align + '"}';
+                            }
+                            tableString += '>' + columns[index][i].title + '</th>';
+                        }
+                    }
+                    tableString += '\n</tr>';
+                });
+            }
+            // 载入内容
+            var rows = printDatagrid.datagrid("getRows"); // 这段代码是获取当前页的所有行
+            var nl = eval('([' + nameList.substring(1) + '])');
+            for (var i = 0; i < rows.length; ++i) {
+                tableString += '\n<tr>';
+                $(nl).each(function (j) {
+                    var e = nl[j].f.lastIndexOf('_0');
+
+                    tableString += '\n<td';
+                    if (nl[j].a != 'undefined' && nl[j].a != '') {
+                        tableString += ' style="text-align:' + nl[j].a + ';"';
+                    }
+                    tableString += '>';
+                    if (e + 2 == nl[j].f.length) {
+                        tableString += rows[i][nl[j].f.substring(0, e)];
+                    }
+                    else
+                        tableString += rows[i][nl[j].f];
+                    tableString += '</td>';
+                });
+                tableString += '\n</tr>';
+            }
+            tableString += '\n</table></div>';
+
+            window.showModalDialog("print.htm", tableString,
+    "location:No;status:No;help:No;dialogWidth:800px;dialogHeight:600px;scroll:auto;");
+        }
+    </script>
+</head>
+<body>	
+
+	<table id="tt" class="easyui-datagrid" style="width: 100%; height: 450px"
+			url="select_rz.php" fit="true"
+			toolbar="#tb" striped="true"
+			rownumbers="true" pagination="true" pageSize="20">
+		<thead>
+			<tr>
+				<th field="czy" width="150" align="center" editor="text">操作员</th>
+				<th field="time" width="150" align="center" editor="text">操作时间</th>
+				<th field="cz" width="2000"  editor="text">操作</th>
+			</tr>
+		</thead>
+	</table>
+
+	<div id="tb" style="padding:3px">
+		<select name="st_c" id="st_c" style="width:80px;">
+			<option value="czy">操作员</option>
+			<option value="time">操作时间</option>
+		</select>
+		<input id="productid" style="line-height:26px;border:1px solid #ccc" type="text" value="时间格式:1900/01/01" onfocus="javascript:if(this.value=='时间格式:1900/01/01')this.value='';">
+		<a href="#" class="easyui-linkbutton" iconCls="icon-search" plain="true" onclick="doSearch()">搜索</a>	
+	</div>
+	
+	
+	
+</body>
+</html>
